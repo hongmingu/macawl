@@ -7,21 +7,18 @@
     {% include 'others/header_metas.html' %}
 
     {% load static from staticfiles %}
-    <script src="{% static 'js/navbar.js' %}"></script>
-    <script src="{% static 'js/a_selected.js' %}"></script>
+    {% include 'others/header_navbar.html' %}
 
-    <script src="{% static 'js/generate_uuid.js' %}"></script>
-    <script src="{% static 'js/register_url.js' %}"></script>
+
+    <script src="{% static 'js/generate_uuid.min.js' %}"></script>
+    <script src="{% static 'js/register_url.min.js' %}"></script>
 
     <link rel="stylesheet" href="{% static 'cropper/cropper.min.css' %}">
     <script src="{% static 'cropper/cropper.min.js' %}"></script>
-    <link href="https://fonts.googleapis.com/css?family=Tauri" rel="stylesheet">
 
 </head>
 <body class="light_background_color height_100">
 {% include 'baseapp/_navbar.html' %}
-
-{% include 'others/bootstrap_tester.html' %}
 
 {% if user.is_authenticated %}
     <div class="hidden" id="user_id">{{ user.username }}</div>

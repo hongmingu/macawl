@@ -24,12 +24,13 @@
     <meta name="twitter:creator" content="@{{ chosen_user.userusername.username }}">
 
     {% load static from staticfiles %}
-    <script src="{% static 'js/navbar.js' %}"></script>
-    <script src="{% static 'js/a_selected.js' %}"></script>
-    <script src="{% static 'js/suobj_populate.js' %}"></script>
-    <script src="{% static 'js/bridger_bridging.js' %}"></script>
-    <script src="{% static 'js/date_differ.js' %}"></script>
-    <script src="{% static 'js/user_profile.js' %}"></script>
+    {% include 'others/header_navbar.html' %}
+
+
+    <script src="{% static 'js/suobj_populate.min.js' %}"></script>
+    <script src="{% static 'js/bridger_bridging.min.js' %}"></script>
+    <script src="{% static 'js/date_differ.min.js' %}"></script>
+    <script src="{% static 'js/user_profile.min.js' %}"></script>
 
 
 </head>

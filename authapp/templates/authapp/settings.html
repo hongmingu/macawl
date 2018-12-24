@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <title>Demo</title>
+    {% include 'authapp/_header_title.html' %}
     {% include 'others/header_static.html' %}
     {% load static from staticfiles %}
-    <script src="{% static 'js/navbar.js' %}"></script>
-    <script src="{% static 'js/settings.js' %}"></script>
+    {% include 'others/header_navbar.html' %}
+
     <link rel="stylesheet" href="{% static 'cropper/cropper.min.css' %}">
     <script src="{% static 'cropper/cropper.min.js' %}"></script>
 
