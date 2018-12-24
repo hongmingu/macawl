@@ -3,14 +3,12 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title>Demo</title>
     {% include 'others/header_static.html' %}
-    {% include 'others/favicon.html' %}
 
     {% load static from staticfiles %}
-    <script src="{% static 'js/navbar.js' %}"></script>
-    <script src="{% static 'js/a_selected.js' %}"></script>
-    <script src="{% static 'js/date_differ.js' %}"></script>
-    <script src="{% static 'js/suobj_populate.js' %}"></script>
-    <script src="{% static 'js/suobj.js' %}"></script>
+    {% include 'others/header_navbar.html' %}
+    <script src="{% static 'js/date_differ.min.js' %}"></script>
+    <script src="{% static 'js/suobj_populate.min.js' %}"></script>
+    <script src="{% static 'js/suobj.min.js' %}"></script>
 
 </head>
 <body class="light_background_color height_100">
