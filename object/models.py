@@ -31,7 +31,7 @@ class UrlObject(models.Model):
 
     is_discrete = models.BooleanField(default=False)
     in_not_301 = models.BooleanField(default=False)
-    discrete_loc = models.TextField(max_length=2050, null=True, unique=True, blank=True, default=None)
+    discrete_loc = models.TextField(max_length=2050, null=True, blank=True, default=None)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
