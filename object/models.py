@@ -181,18 +181,11 @@ class SubUrlObjectComment(models.Model):
 class SubUrlObjectCommentCount(models.Model):
     sub_url_object = models.OneToOneField(SubUrlObject, on_delete=models.CASCADE, null=True, blank=True)
     count = models.PositiveIntegerField(default=0)
-    #- -----------
-    transaction_id = models.CharField(max_length=255, blank=True, null=True, default=None)
-    #- -----------
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
-    #- -----------
 
     def __str__(self):
         return "post: %s" % self.sub_url_object.pk
-
-    class Meta:
-        unique_together = ('sub_url_object ', 'transaction_id',)
 
 
 class SubKeyword(models.Model):
