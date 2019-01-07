@@ -3,7 +3,7 @@
     --main-logoblue-color: #061283;
     --main-aselected-bcolor: #dfe6e9;
     --main-aselected-color: #fdcb6e;
-    --main-light-bcolor: #d2dae2;
+    --main-light-bcolor: #ececec;
 
 }
 @media screen and (max-width: 768px) {
@@ -121,7 +121,7 @@
 }
 
 .light_background_color {
-    background-color: var(--main-light-bcolor, #d2dae2);
+    background-color: #ececec;
 }
 
 .height_100 {
