@@ -22,9 +22,8 @@ from django.utils.timezone import now
 
 class UrlObject(models.Model):
 
-    loc = models.TextField(max_length=2050, null=True, unique=True, blank=True, default=None)
+    loc = models.TextField(max_length=2050, null=True, blank=True, default=None)
 
-    # 여기서 unique True 면 null값도 두 개 이상 넣을 수 없나?
     http = models.BooleanField(default=False)
     https = models.BooleanField(default=False)
     uuid = models.CharField(max_length=34, unique=True, null=True, default=None, blank=True)
@@ -238,9 +237,6 @@ class SubRawKeyword(models.Model):
     text = models.TextField(max_length=2048, null=True, blank=True)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ('sub_url_object', 'text',)
 
 
 class SubRawKeywordCount(models.Model):

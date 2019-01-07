@@ -348,94 +348,110 @@ def re_register_url(request):
                     return JsonResponse({'res': 0})
 
                 url_object = None
+                if UrlObject.objects.filter(loc=loc).exists():
+                    url_object = UrlObject.objects.filter(loc=loc).last()
+                sub_url_object = None
                 try:
-                    url_object = UrlObject.objects.get(loc=loc)
-                except Exception as e:
-                    pass
+                    with transaction.atomic():
 
-                if url_object is not None:
-                    if scheme == 'http':
-                        url_object.http = True
-                        url_object.is_discrete = is_discrete
-                        url_object.in_not_301 = in_not_301
-                        url_object.discrete_loc = discrete_loc
-                        url_object.save()
-                    elif scheme == 'https':
-                        url_object.https = True
-                        url_object.is_discrete = is_discrete
-                        url_object.in_not_301 = in_not_301
-                        url_object.discrete_loc = discrete_loc
-                        url_object.save()
-                    title = None
-                    try:
-                        title = Title.objects.last()
-                    except Exception as e:
-                        pass
-                    if title is not None:
-                        if title.text != title_text:
+                        if url_object is not None:
+                            if scheme == 'http':
+                                url_object.http = True
+                                url_object.is_discrete = is_discrete
+                                url_object.in_not_301 = in_not_301
+                                url_object.discrete_loc = discrete_loc
+                                url_object.save()
+                            elif scheme == 'https':
+                                url_object.https = True
+                                url_object.is_discrete = is_discrete
+                                url_object.in_not_301 = in_not_301
+                                url_object.discrete_loc = discrete_loc
+                                url_object.save()
+                            title = None
+                            try:
+                                title = Title.objects.last()
+                            except Exception as e:
+                                pass
+                            if title is not None:
+                                if title.text != title_text:
+                                    title = Title.objects.create(text=title_text, url_object=url_object)
+                            else:
+                                title = Title.objects.create(text=title_text, url_object=url_object)
+
+                            sub_url_object = None
+                            try:
+                                sub_url_object = SubUrlObject.objects.get(user=request.user, url_object=url_object)
+                            except Exception as e:
+                                pass
+                            if sub_url_object is None:
+                                sub_url_object = SubUrlObject.objects.create(user=request.user,
+                                                                             title=title,
+                                                                             url_object=url_object,
+                                                                             uuid=uuid.uuid4().hex)
+
+
+                        else:
+                            # url_object가 없다. 키워드고 뭐고 없음.
+                            id = uuid.uuid4().hex
+                            if scheme == 'http':
+                                url_object = UrlObject.objects.create(loc=loc, http=True, https=False,
+                                                                      is_discrete=is_discrete,
+                                                                      in_not_301=in_not_301, discrete_loc=discrete_loc,
+                                                                      uuid=id)
+                            elif scheme == 'https':
+                                url_object = UrlObject.objects.create(loc=loc, http=False, https=True,
+                                                                      is_discrete=is_discrete,
+                                                                      in_not_301=in_not_301, discrete_loc=discrete_loc,
+                                                                      uuid=id)
                             title = Title.objects.create(text=title_text, url_object=url_object)
-                    else:
-                        title = Title.objects.create(text=title_text, url_object=url_object)
+                            sub_url_object = SubUrlObject.objects.create(user=request.user,
+                                                                         title=title,
+                                                                         url_object=url_object,
+                                                                         uuid=uuid.uuid4().hex)
 
-                    sub_url_object = None
-                    try:
-                        sub_url_object = SubUrlObject.objects.get(user=request.user, url_object=url_object)
-                    except Exception as e:
-                        pass
-                    if sub_url_object is None:
-                        sub_url_object = SubUrlObject.objects.create(user=request.user,
-                                                                     title=title,
-                                                                     url_object=url_object,
-                                                                     uuid=uuid.uuid4().hex)
+                        sub_url_object_initial_url = SubUrlObjectInitialUrl.objects.create(user=request.user,
+                                                                                           url=init_url,
+                                                                                           sub_url_object=sub_url_object)
 
+                        new_keyword_list = []
+                        for item in keyword_list:
+                            new_keyword_list.append(item.strip())
 
+                        for item in new_keyword_list:
+                            text = item.replace(" ", "")
+                            keyword = Keyword.objects.get_or_create(text=text)
+
+                            url_keyword = None
+                            if UrlKeyword.objects.filter(url_object=url_object, keyword=keyword[0]).exists():
+                                url_keyword = UrlKeyword.objects.get(url_object=url_object, keyword=keyword[0])
+                            else:
+                                url_keyword = UrlKeyword.objects.create(url_object=url_object,
+                                                                        keyword=keyword[0],
+                                                                        uuid=uuid.uuid4().hex)
+
+                            sub_keyword = SubKeyword.objects.get_or_create(keyword=keyword[0],
+                                                                           user=request.user)
+                            sub_url_object_sub_keyword = SubUrlObjectSubKeyword.objects.get_or_create(
+                                sub_url_object=sub_url_object,
+                                sub_keyword=sub_keyword[0])
+                            sub_raw_keyword_count = SubRawKeywordCount.objects.get_or_create(
+                                sub_url_object=sub_url_object)
+                            if sub_raw_keyword_count[0].count < 31:
+                                sub_raw_keyword = SubRawKeyword.objects.get_or_create(text=item,
+                                                                                      sub_keyword=sub_keyword[0],
+                                                                                      sub_url_object=sub_url_object,
+                                                                                      user=request.user)
+                except Exception as e:
+                    print(e)
+                    return JsonResponse({'res': 0})
+
+                if sub_url_object is not None:
+                    return JsonResponse({'res': 1, 'id': sub_url_object.uuid})
                 else:
-                    # url_object가 없다. 키워드고 뭐고 없음.
-                    id = uuid.uuid4().hex
-                    if scheme == 'http':
-                        url_object = UrlObject.objects.create(loc=loc, http=True, https=False, is_discrete=is_discrete,
-                                                              in_not_301=in_not_301, discrete_loc=discrete_loc, uuid=id)
-                    elif scheme == 'https':
-                        url_object = UrlObject.objects.create(loc=loc, http=False, https=True, is_discrete=is_discrete,
-                                                              in_not_301=in_not_301, discrete_loc=discrete_loc, uuid=id)
-                    title = Title.objects.create(text=title_text, url_object=url_object)
-                    sub_url_object = SubUrlObject.objects.create(user=request.user,
-                                                                 title=title,
-                                                                 url_object=url_object,
-                                                                 uuid=uuid.uuid4().hex)
+                    return JsonResponse({'res': 0})
 
-                sub_url_object_initial_url = SubUrlObjectInitialUrl.objects.create(user=request.user,
-                                                                                   url=init_url,
-                                                                                   sub_url_object=sub_url_object)
-
-                new_keyword_list = []
-                for item in keyword_list:
-                    new_keyword_list.append(item.strip())
-
-                for item in new_keyword_list:
-                    text = item.replace(" ", "")
-                    keyword = Keyword.objects.get_or_create(text=text)
-
-                    url_keyword = None
-                    if UrlKeyword.objects.filter(url_object=url_object, keyword=keyword[0]).exists():
-                        url_keyword = UrlKeyword.objects.get(url_object=url_object, keyword=keyword[0])
-                    else:
-                        url_keyword = UrlKeyword.objects.create(url_object=url_object,
-                                                                keyword=keyword[0],
-                                                                uuid=uuid.uuid4().hex)
-
-                    sub_keyword = SubKeyword.objects.get_or_create(keyword=keyword[0],
-                                                                   user=request.user)
-                    sub_url_object_sub_keyword = SubUrlObjectSubKeyword.objects.get_or_create(sub_url_object=sub_url_object,
-                                                                                              sub_keyword=sub_keyword[0])
-                    sub_raw_keyword_count = SubRawKeywordCount.objects.get_or_create(sub_url_object=sub_url_object)
-                    if sub_raw_keyword_count[0].count < 31:
-                        sub_raw_keyword = SubRawKeyword.objects.get_or_create(text=item,
-                                                                              sub_keyword=sub_keyword[0],
-                                                                              sub_url_object=sub_url_object,
-                                                                              user=request.user)
-                return JsonResponse({'res': 1, 'id': sub_url_object.uuid})
         return JsonResponse({'res': 2})
+
 
 @ensure_csrf_cookie
 def re_update_url(request):
@@ -512,72 +528,78 @@ def re_update_complete_url(request):
 
                 url_object = sub_url_object.url_object
 
-                if refresh == 'true':
-                    status_code = request.POST.get('status_code', None)
-                    title_text = request.POST.get('title', None)
-                    title = None
-                    if title_text != url_object.title_set.last().text:
-                        title = Title.objects.create(text=title_text,
-                                                     url_object=url_object,
-                                                     status_code=status_code)
-                    else:
-                        title = url_object.title_set.last()
+                try:
+                    with transaction.atomic():
+                        if refresh == 'true':
+                            status_code = request.POST.get('status_code', None)
+                            title_text = request.POST.get('title', None)
+                            title = None
+                            if title_text != url_object.title_set.last().text:
+                                title = Title.objects.create(text=title_text,
+                                                             url_object=url_object,
+                                                             status_code=status_code)
+                            else:
+                                title = url_object.title_set.last()
 
-                    if title is not None:
-                        sub_url_object.title = title
-                        sub_url_object.save()
+                            if title is not None:
+                                sub_url_object.title = title
+                                sub_url_object.save()
 
-                keyword_list = request.POST.getlist('keyword_list[]')
-                delete_list = request.POST.getlist('delete_list[]')
+                        keyword_list = request.POST.getlist('keyword_list[]')
+                        delete_list = request.POST.getlist('delete_list[]')
 
-                if len(keyword_list) <= len(delete_list):
+                        if len(keyword_list) <= len(delete_list):
+                            return JsonResponse({'res': 0})
+                        if len(keyword_list) == 0:
+                            return JsonResponse({'res': 0})
+
+                        new_keyword_list = []
+
+                        for item in keyword_list:
+                            new_keyword_list.append(item.strip())
+
+                        for item in new_keyword_list:
+                            text = item.replace(" ", "")
+                            keyword = Keyword.objects.get_or_create(text=text)
+
+                            url_keyword = None
+                            if UrlKeyword.objects.filter(url_object=url_object, keyword=keyword[0]).exists():
+                                url_keyword = UrlKeyword.objects.get(url_object=url_object, keyword=keyword[0])
+                            else:
+                                url_keyword = UrlKeyword.objects.create(url_object=url_object,
+                                                                        keyword=keyword[0],
+                                                                        uuid=uuid.uuid4().hex)
+
+                            sub_keyword = SubKeyword.objects.get_or_create(keyword=keyword[0],
+                                                                           user=request.user)
+                            sub_url_object_sub_keyword = SubUrlObjectSubKeyword.objects.get_or_create(
+                                sub_url_object=sub_url_object,
+                                sub_keyword=sub_keyword[0])
+                            sub_raw_keyword_count = SubRawKeywordCount.objects.get_or_create(
+                                sub_url_object=sub_url_object)
+                            if sub_raw_keyword_count[0].count < 31:
+                                sub_raw_keyword = SubRawKeyword.objects.get_or_create(text=item,
+                                                                                      sub_keyword=sub_keyword[0],
+                                                                                      sub_url_object=sub_url_object,
+                                                                                      user=request.user)
+
+                        new_delete_list = []
+                        for item in delete_list:
+                            new_delete_list.append(item.strip())
+
+                        for item in new_delete_list:
+                            sub_raw_keyword = None
+                            try:
+                                sub_raw_keyword = SubRawKeyword.objects.get(text=item,
+                                                                            sub_url_object=sub_url_object,
+                                                                            user=request.user)
+                            except Exception as e:
+                                pass
+                            if sub_raw_keyword is not None:
+                                sub_raw_keyword.delete()
+                except Exception as e:
+                    print(e)
                     return JsonResponse({'res': 0})
-                if len(keyword_list) == 0:
-                    return JsonResponse({'res': 0})
-
-                new_keyword_list = []
-
-                for item in keyword_list:
-                    new_keyword_list.append(item.strip())
-
-                for item in new_keyword_list:
-                    text = item.replace(" ", "")
-                    keyword = Keyword.objects.get_or_create(text=text)
-
-                    url_keyword = None
-                    if UrlKeyword.objects.filter(url_object=url_object, keyword=keyword[0]).exists():
-                        url_keyword = UrlKeyword.objects.get(url_object=url_object, keyword=keyword[0])
-                    else:
-                        url_keyword = UrlKeyword.objects.create(url_object=url_object,
-                                                                keyword=keyword[0],
-                                                                uuid=uuid.uuid4().hex)
-
-                    sub_keyword = SubKeyword.objects.get_or_create(keyword=keyword[0],
-                                                                   user=request.user)
-                    sub_url_object_sub_keyword = SubUrlObjectSubKeyword.objects.get_or_create(sub_url_object=sub_url_object,
-                                                                                              sub_keyword=sub_keyword[0])
-                    sub_raw_keyword_count = SubRawKeywordCount.objects.get_or_create(sub_url_object=sub_url_object)
-                    if sub_raw_keyword_count[0].count < 31:
-                        sub_raw_keyword = SubRawKeyword.objects.get_or_create(text=item,
-                                                                              sub_keyword=sub_keyword[0],
-                                                                              sub_url_object=sub_url_object,
-                                                                              user=request.user)
-
-                new_delete_list = []
-                for item in delete_list:
-                    new_delete_list.append(item.strip())
-
-                for item in new_delete_list:
-                    text = item.replace(" ", "")
-                    sub_raw_keyword = None
-                    try:
-                        sub_raw_keyword = SubRawKeyword.objects.get(text=item,
-                                                                    sub_url_object=sub_url_object,
-                                                                    user=request.user)
-                    except Exception as e:
-                        pass
-                    if sub_raw_keyword is not None:
-                        sub_raw_keyword.delete()
                 return JsonResponse({'res': 1})
         return JsonResponse({'res': 2})
 

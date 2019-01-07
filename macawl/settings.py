@@ -139,7 +139,6 @@ if settings_json['debug']['mode'] == 'dev':
         'authapp.backends.EmailOrUsernameAuthBackend',
         # 'django.contrib.auth.backends.ModelBackend',
     ]
-    '''
     #### Static settings
     STATIC_URL = '/static/'
     STATICFILES_DIRS = [
@@ -172,6 +171,7 @@ if settings_json['debug']['mode'] == 'dev':
     ]
     # Media Setting
     MEDIA_URL = "https://%s/media/" % AWS_S3_CUSTOM_DOMAIN
+    '''
 
     # -------------------------------------------------------------------
 

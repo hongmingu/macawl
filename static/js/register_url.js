@@ -51,7 +51,7 @@ $(function () {
                                 e.preventDefault()
                                 if (value.user_has_it !== 'false') {
                                     var scheme = window.location.protocol == "https:" ? "https://" : "http://";
-                                    var update_location = scheme + window.location.host + "/update/url/" + data.id + '/';
+                                    var update_location = scheme + window.location.host + "/update/url/" + value.user_has_it + '/';
                                     location.href = update_location
                                 }
                                 $('#discrete_loc').html(value.loc)
@@ -147,7 +147,7 @@ $(function () {
                             e.preventDefault()
                             if (value.user_has_it !== 'false') {
                                 var scheme = window.location.protocol == "https:" ? "https://" : "http://";
-                                var update_location = scheme + window.location.host + "/update/url/" + data.id + '/';
+                                var update_location = scheme + window.location.host + "/update/url/" + value.user_has_it + '/';
                                 location.href = update_location
                             }
                             $('#discrete_loc').html(value.loc)
