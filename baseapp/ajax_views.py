@@ -409,9 +409,9 @@ def re_register_url(request):
                                                                          url_object=url_object,
                                                                          uuid=uuid.uuid4().hex)
 
-                        sub_url_object_initial_url = SubUrlObjectInitialUrl.objects.create(user=request.user,
-                                                                                           url=init_url,
-                                                                                           sub_url_object=sub_url_object)
+                        sub_url_object_initial_url = SubUrlObjectInitialUrl.objects.get_or_create(user=request.user,
+                                                                                                  url=init_url,
+                                                                                                  sub_url_object=sub_url_object)
 
                         new_keyword_list = []
                         for item in keyword_list:
