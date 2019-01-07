@@ -47,7 +47,7 @@ class UrlObject(models.Model):
 
 
 class Keyword(models.Model):
-    text = models.TextField(max_length=2048, null=True, blank=True, unique=True)
+    text = models.TextField(max_length=2048, null=True, blank=True)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
