@@ -53,6 +53,7 @@ $(function () {
                                     var scheme = window.location.protocol == "https:" ? "https://" : "http://";
                                     var update_location = scheme + window.location.host + "/update/url/" + value.user_has_it + '/';
                                     location.href = update_location
+                                    return false
                                 }
                                 $('#discrete_loc').html(value.loc)
                                 $('#discrete_scheme').html(value.discrete_scheme)
@@ -149,6 +150,7 @@ $(function () {
                                 var scheme = window.location.protocol == "https:" ? "https://" : "http://";
                                 var update_location = scheme + window.location.host + "/update/url/" + value.user_has_it + '/';
                                 location.href = update_location
+                                return false
                             }
                             $('#discrete_loc').html(value.loc)
                             $('#discrete_scheme').html(value.discrete_scheme)
