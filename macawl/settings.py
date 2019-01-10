@@ -271,23 +271,6 @@ elif settings_json['debug']['mode'] == 'deploy':
     }
 
 
-    '''
-    # without emoji
-    DATABASES = {
-        'default': {
-            'ENGINE': settings_json['database']['default']['engine'],
-            'NAME': settings_json['database']['default']['name'],
-            'USER': settings_json['database']['default']['user'],
-            'PASSWORD': settings_json['database']['default']['password'],
-            'HOST': settings_json['database']['default']['host'],
-            'PORT': settings_json['database']['default']['port'],
-            'OPTIONS': {
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-            }
-        }
-    }
-    '''
-
     # Password validation
     # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
 
