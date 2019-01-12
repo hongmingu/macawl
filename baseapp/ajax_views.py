@@ -192,63 +192,68 @@ def check_success_url(url, o_count, success_list, not_301_redirect_list, user):
                 import metadata_parser
                 # 다음은 어이없게도 daum.net 입력시 301 redirect 가 없다.
                 if not any(i.get('url') == req.url for i in success_list):
-                    got_url = req.url
-
-                    page = None
-                    discrete_url = None
-
                     try:
+                        got_url = req.url
+
+                        page = None
+                        discrete_url = None
+                        # try:
+                        #     page = metadata_parser.MetadataParser(url=got_url, search_head_only=False, url_headers=headers)
+                        # except Exception as e:
+                        #     print(e)
+                        #     return
                         page = metadata_parser.MetadataParser(url=got_url, search_head_only=False, url_headers=headers)
+
+                        no_args_url = furl_obj.remove(args=True, fragment=True).url
+                        f = furl(got_url)
+
+                        loc = got_url.replace(f.scheme + '://', '', 1)
+                        title = page.get_metadatas('title', strategy=['page'])
+                        title = title[0]
+
+
+                        scheme = f.scheme
+
+                        discrete_loc = None
+                        discrete_scheme = None
+
+                        if page is not None:
+                            discrete_url = page.get_discrete_url()
+                            f_discrete = furl(discrete_url)
+                            discrete_loc = discrete_url.replace(f_discrete.scheme + '://', '', 1)
+                            discrete_scheme = f_discrete.scheme
+
+                        is_discrete = 'false'
+                        if discrete_url == req.url:
+                            is_discrete = 'true'
+
+                        not_301_redirect = 'false'
+                        if got_url in not_301_redirect_list:
+                            not_301_redirect = 'true'
+
+                        user_has_it = 'false'
+                        sub_url_object = None
+                        try:
+                            sub_url_object = SubUrlObject.objects.get(user=user, url_object__loc=loc)
+                        except Exception as e:
+                            pass
+                        if sub_url_object is not None:
+                            user_has_it = sub_url_object.uuid
+
+                        sub_appender = {'url': got_url,
+                                        'loc': loc,
+                                        'title': title,
+                                        'scheme': scheme,
+                                        'is_discrete': is_discrete,
+                                        'discrete_loc': discrete_loc,
+                                        'discrete_scheme': discrete_scheme,
+                                        'in_not_301': not_301_redirect,
+                                        'user_has_it': user_has_it
+                                        }
+                        success_list.append(sub_appender)
                     except Exception as e:
                         print(e)
                         return
-
-                    no_args_url = furl_obj.remove(args=True, fragment=True).url
-                    f = furl(got_url)
-
-                    loc = got_url.replace(f.scheme + '://', '', 1)
-                    title = page.get_metadatas('title', strategy=['page'])
-                    title = title[0]
-
-                    scheme = f.scheme
-
-                    discrete_loc = None
-                    discrete_scheme = None
-
-                    if page is not None:
-                        discrete_url = page.get_discrete_url()
-                        f_discrete = furl(discrete_url)
-                        discrete_loc = discrete_url.replace(f_discrete.scheme + '://', '', 1)
-                        discrete_scheme = f_discrete.scheme
-
-                    is_discrete = 'false'
-                    if discrete_url == req.url:
-                        is_discrete = 'true'
-
-                    not_301_redirect = 'false'
-                    if got_url in not_301_redirect_list:
-                        not_301_redirect = 'true'
-
-                    user_has_it = 'false'
-                    sub_url_object = None
-                    try:
-                        sub_url_object = SubUrlObject.objects.get(user=user, url_object__loc=loc)
-                    except Exception as e:
-                        pass
-                    if sub_url_object is not None:
-                        user_has_it = sub_url_object.uuid
-
-                    sub_appender = {'url': got_url,
-                                    'loc': loc,
-                                    'title': title,
-                                    'scheme': scheme,
-                                    'is_discrete': is_discrete,
-                                    'discrete_loc': discrete_loc,
-                                    'discrete_scheme': discrete_scheme,
-                                    'in_not_301': not_301_redirect,
-                                    'user_has_it': user_has_it
-                                    }
-                    success_list.append(sub_appender)
                 else:
                     return
                 o_count = o_count + 1
@@ -268,7 +273,6 @@ def check_success_url(url, o_count, success_list, not_301_redirect_list, user):
                 try:
                     url = req.headers['Location']
                     not_301_redirect_list.append(url)
-
                     print(url)
                 except Exception as e:
                     print(e)
