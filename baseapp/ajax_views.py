@@ -170,11 +170,12 @@ def check_success_url(url, o_count, success_list, not_301_redirect_list, user):
 
         url = furl_obj.remove(fragment=True).url
         # url = furl_obj.url
-
         try:
             req = requests.get(url, allow_redirects=False, headers=headers)
+            # req = requests.get(url, allow_redirects=False, headers=headers, proxies=pD)
         except Exception as e:
             print('requests error: ' + str(e) + ' at: ' + url)
+            is_success = True
             return
         if req is not None:
             if req.status_code == 301:
@@ -192,6 +193,7 @@ def check_success_url(url, o_count, success_list, not_301_redirect_list, user):
                 import metadata_parser
                 # 다음은 어이없게도 daum.net 입력시 301 redirect 가 없다.
                 if not any(i.get('url') == req.url for i in success_list):
+                    sub_success = False
                     try:
                         got_url = req.url
 
@@ -251,24 +253,27 @@ def check_success_url(url, o_count, success_list, not_301_redirect_list, user):
                                         'user_has_it': user_has_it
                                         }
                         success_list.append(sub_appender)
+                        sub_success = True
                     except Exception as e:
                         print(e)
                         return
-                else:
-                    return
-                o_count = o_count + 1
-                # discrete url 체크
+                    if sub_success is True:
+                        o_count = o_count + 1
+                        # discrete url 체크
 
-                if discrete_url != req.url:
-                    check_success_url(discrete_url, o_count, success_list, not_301_redirect_list, user)
+                        if discrete_url != req.url:
+                            check_success_url(discrete_url, o_count, success_list, not_301_redirect_list, user)
+                        else:
+                            pass
+                        if no_args_url != req.url:
+                            check_success_url(no_args_url, o_count, success_list, not_301_redirect_list, user)
+                        else:
+                            pass
+                    is_success = True
+                    return
                 else:
-                    pass
-                if no_args_url != req.url:
-                    check_success_url(no_args_url, o_count, success_list, not_301_redirect_list, user)
-                else:
-                    pass
-                is_success = True
-                continue
+                    is_success = True
+                    return
             else:
                 try:
                     url = req.headers['Location']
@@ -276,6 +281,7 @@ def check_success_url(url, o_count, success_list, not_301_redirect_list, user):
                     print(url)
                 except Exception as e:
                     print(e)
+                    is_success = True
                     return
                 continue
     return
