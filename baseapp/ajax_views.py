@@ -171,8 +171,12 @@ def check_success_url(url, o_count, success_list, not_301_redirect_list, user):
         try:
             req = requests.get(url, allow_redirects=False, headers=headers, timeout=5)
             # req = requests.get(url, allow_redirects=False, headers=headers, proxies=pD)
+        except requests.RequestException as e:
+            print('timeout: ' + str(e) + '// at: ' + url)
+            is_success = True
+            return
         except Exception as e:
-            print('requests error: ' + str(e) + ' at: ' + url)
+            print('requests error: ' + str(e) + '// at: ' + url)
             is_success = True
             return
         if req is not None:
