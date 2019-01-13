@@ -31,8 +31,6 @@ from .models import *
 from django.contrib.auth import update_session_auth_hash
 from django.utils.html import escape, _js_escapes, normalize_newlines
 from object.numbers import *
-
-
 # Create your models here.
 # 좋아요 비공개 할 수 있게
 # 챗스톡, 페이지픽, 임플린, 챗카부 순으로 만들자.
@@ -171,7 +169,7 @@ def check_success_url(url, o_count, success_list, not_301_redirect_list, user):
         url = furl_obj.remove(fragment=True).url
         # url = furl_obj.url
         try:
-            req = requests.get(url, allow_redirects=False, headers=headers)
+            req = requests.get(url, allow_redirects=False, headers=headers, timeout=5)
             # req = requests.get(url, allow_redirects=False, headers=headers, proxies=pD)
         except Exception as e:
             print('requests error: ' + str(e) + ' at: ' + url)
