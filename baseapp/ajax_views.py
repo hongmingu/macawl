@@ -508,8 +508,11 @@ def re_refresh_url(request):
                 }
                 try:
                     req = requests.get(url, allow_redirects=False, headers=headers)
+                except requests.RequestException as e:
+                    print('timeout: ' + str(e) + '// at: ' + url)
+                    return JsonResponse({'res': 0})
                 except Exception as e:
-                    print('requests error: ' + str(e) + ' at: ' + url)
+                    print('requests error: ' + str(e) + '// at: ' + url)
                     return JsonResponse({'res': 0})
                 import metadata_parser
                 try:
