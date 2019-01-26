@@ -9,7 +9,6 @@ $(function () {
                 order: $('#order').html()
             },
             success: function (data) {
-                console.log(data)
                 if (data.res === 1) {
                     //user set
                     if (data.output.length === 0) {
@@ -48,7 +47,6 @@ $(function () {
                 order: $('#order').html()
             },
             success: function (data) {
-                console.log(data)
                 if (data.res === 1) {
                     //user set
                     if (data.output.length === 0) {

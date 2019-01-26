@@ -752,52 +752,52 @@ def strip_scheme(url):
 @ensure_csrf_cookie
 def re_profile_suobj(request):
     if request.method == "POST":
-        if request.user.is_authenticated:
-            if request.is_ajax():
-                chosen_user_id = request.POST.get('chosen_user_id', None)
-                last_id = request.POST.get('last_suobj_id', None)
-                user = None
+        if request.is_ajax():
+            chosen_user_id = request.POST.get('chosen_user_id', None)
+            last_id = request.POST.get('last_suobj_id', None)
+            user = None
+            step = 20
+            try:
+                user = User.objects.get(username=chosen_user_id)
+            except Exception as e:
+                print(e)
+                return JsonResponse({'res': 0})
+            suobjs = None
+
+            if last_id == '':
+                suobjs = SubUrlObject.objects.filter(Q(user=user)).order_by('-created').distinct()[:step]
+            else:
+                last_suojs = None
                 try:
-                    user = User.objects.get(username=chosen_user_id)
+                    last_suojs = SubUrlObject.objects.get(uuid=last_id)
                 except Exception as e:
                     print(e)
+
                     return JsonResponse({'res': 0})
-                suobjs = None
+                if last_suojs is not None:
+                    suobjs = SubUrlObject.objects.filter(
+                        Q(user=user) & Q(pk_lt=last_suojs.pk)).order_by('-created').distinct()[:step]
 
-                if last_id == '':
-                    suobjs = SubUrlObject.objects.filter(Q(user=user)).order_by('-created').distinct()[:20]
-                else:
-                    last_suojs = None
-                    try:
-                        last_suojs = SubUrlObject.objects.get(uuid=last_id)
-                    except Exception as e:
-                        print(e)
+            # 이제 리스트 만드는 코드가 필요하다. #########
 
-                        return JsonResponse({'res': 0})
-                    if last_suojs is not None:
-                        suobjs = SubUrlObject.objects.filter(
-                            Q(user=user) & Q(pk_lt=last_suojs.pk)).order_by('-created').distinct()[:20]
+            # filter(Q(post__uuid=post_id) & Q(pk__lt=last_post_chat.pk))
+            ################################
+            output = []
+            count = 0
+            last = None
+            sub_output = None
+            for suobj in suobjs:
+                count = count + 1
+                if count == step:
+                    last = suobj.uuid
 
-                # 이제 리스트 만드는 코드가 필요하다. #########
+                sub_output = {
+                    'id': suobj.uuid,
+                }
 
-                # filter(Q(post__uuid=post_id) & Q(pk__lt=last_post_chat.pk))
-                ################################
-                output = []
-                count = 0
-                last = None
-                sub_output = None
-                for suobj in suobjs:
-                    count = count + 1
-                    if count == 20:
-                        last = suobj.uuid
+                output.append(sub_output)
 
-                    sub_output = {
-                        'id': suobj.uuid,
-                    }
-
-                    output.append(sub_output)
-
-                return JsonResponse({'res': 1, 'output': output, 'last': last})
+            return JsonResponse({'res': 1, 'output': output, 'last': last})
 
         return JsonResponse({'res': 2})
 
@@ -1045,6 +1045,57 @@ def re_url_populate(request):
             return JsonResponse({'res': 1, 'full_url': url_object.get_url(), 'title': url_object.title_set.last().text})
 
         return JsonResponse({'res': 2})
+
+
+
+@ensure_csrf_cookie
+def re_url_object(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            url_id = request.POST.get('url_id', None)
+            end_id = request.POST.get('end_id', None)
+
+            step = 20
+
+            url_object = None
+            try:
+                url_object = UrlObject.objects.get(uuid=url_id)
+            except Exception as e:
+                print(e)
+                return JsonResponse({'res': 0})
+
+            if end_id == '':
+                suobjs = SubUrlObject.objects.filter(Q(url_object=url_object)).order_by(
+                    '-created').distinct()[:step]
+            else:
+                try:
+                    end_suobj = SubUrlObject.objects.get(uuid=end_id)
+                except Exception as e:
+                    print(e)
+                    return JsonResponse({'res': 0})
+                suobjs = SubUrlObject.objects.filter(Q(url_object=url_object) & Q(pk__lt=end_suobj.pk)).order_by(
+                    '-created').distinct()[:step]
+
+            output = []
+            count = 0
+            end = None
+            for suobj in suobjs:
+                count = count + 1
+                if count == step:
+                    end = suobj.uuid
+
+                sub_output = {
+                    'id': suobj.uuid,
+                }
+
+                output.append(sub_output)
+
+            return JsonResponse({'res': 1,
+                                 'output': output,
+                                 'end': end})
+
+        return JsonResponse({'res': 2})
+
 
 
 @ensure_csrf_cookie

@@ -71,7 +71,8 @@ urlpatterns = [
             name='re_help_list'),
     re_path(r'^re/url/populate/$', base_ajax_views.re_url_populate,
             name='re_url_populate'),
-
+    re_path(r'^re/url/object/$', base_ajax_views.re_url_object,
+            name='re_url_object'),
     re_path(r'^re/url/keyword/$', base_ajax_views.re_url_keyword,
             name='re_url_keyword'),
 

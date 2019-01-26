@@ -628,6 +628,8 @@ a:active {
 
 .pop_url {
     font-size: 12px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 .pop_public_info {
@@ -720,10 +722,14 @@ a:active {
 
 .url_info_title {
     font-size: 20px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 .url_info_url {
-    font-size: 16px;
+    font-size: 14px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 .url_info_title_wrapper {
