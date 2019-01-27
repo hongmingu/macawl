@@ -844,6 +844,8 @@ a:active {
 
 .url_pop_title {
     font-size: 20px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 .url_pop_title_wrapper {
@@ -878,6 +880,8 @@ a:active {
 
 .search_suobj_title {
     font-size: 14px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 .search_suobj_url {
