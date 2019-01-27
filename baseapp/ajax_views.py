@@ -1370,11 +1370,11 @@ def re_search_all(request):
             url_output = []
             if loc is None:
                 url_objects = UrlObject.objects.filter(Q(urlkeyword__keyword__text__icontains=search_word)).order_by(
-                    '-urlkeyword__up_count')[:10]
+                    '-urlkeyword__register_count')[:10]
             else:
                 url_objects = UrlObject.objects.filter(
                     Q(urlkeyword__keyword__text__icontains=search_word) | Q(loc__icontains=loc)).order_by(
-                    '-urlkeyword__up_count')[:10]
+                    '-urlkeyword__register_count')[:10]
             for url_object in url_objects:
                 url_output.append(url_object.uuid)
 
@@ -1652,12 +1652,12 @@ def re_search_url(request):
 
             if loc is None:
                 url_objects = UrlObject.objects.filter(Q(urlkeyword__keyword__text__icontains=search_word)).order_by(
-                    '-urlkeyword__up_count')[order:order + step]
+                    '-urlkeyword__register_count')[order:order + step]
 
             else:
                 url_objects = UrlObject.objects.filter(
                     Q(urlkeyword__keyword__text__icontains=search_word)
-                    | Q(loc__icontains=loc)).order_by('-urlkeyword__up_count')[order:order + step]
+                    | Q(loc__icontains=loc)).order_by('-urlkeyword__register_count')[order:order + step]
 
             end = 'false'
             if url_objects.count() < step:
