@@ -831,7 +831,9 @@ a:active {
 .more_load {
     background-color: var(--main-aselected-color, lightyellow);
 }
-
+.more_load_url {
+    background-color: var(--main-aselected-bcolor, lightblue);
+}
 .url_pop_menu {
     font-size: 12px;
 }
@@ -850,6 +852,8 @@ a:active {
 
 .url_pop_url {
     font-size: 14px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 .url_pop_url_wrapper {
@@ -878,6 +882,8 @@ a:active {
 
 .search_suobj_url {
     font-size: 12px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 .search_suobj_keyword {

@@ -1,4 +1,4 @@
-var search_url_populate = function search_url_populate(id) {
+var search_url_populate_sec = function search_url_populate_sec(id) {
     var con_id = id
     $(function () {
         $.ajax({
@@ -18,9 +18,7 @@ var search_url_populate = function search_url_populate(id) {
                         '<div class="url_pop_url_wrapper"><span class="url_pop_url">' + data.full_url + '</span></div>' +
                         '</div>' +
                         '</a>' +
-                        '<div id="keyword_list_' + id + '"></div>' +
-                        '<div class="hidden" id="last_url_keyword_' + id + '"></div>' +
-                        '<a href=""><div class="hidden" id="keyword_more_' + id + '">more load</div></a>' +
+                        '<a href="/url/' + data.id + '/"><div class="more_load_url clickable">url info</div></a>' +
                         '</div>'
                     $('#url_wrapper_' + id).append(appender)
 
@@ -45,7 +43,7 @@ $(function () {
     $("#modal_pop_menu").on("shown.bs.modal", function () {
         var source = $('#search_link_source').html()
         var scheme = window.location.protocol == "https:" ? "https" : "http";
-        var path = scheme + '://' + window.location.host + source + '/';
+        var path = scheme + '://' + window.location.host + source;
         $('#modal_pop_menu_input').val(path).select();
     }).on("hidden.bs.modal", function () {
         $('#link_source').html('')
@@ -56,7 +54,7 @@ $(function () {
         e.preventDefault()
         var source = $('#search_link_source').html()
         var scheme = window.location.protocol == "https:" ? "https" : "http";
-        var path = scheme + '://' + window.location.host + source + '/';
+        var path = scheme + '://' + window.location.host + source;
         $('#modal_pop_menu_input').val(path).select();
         document.execCommand('Copy')
     })
@@ -64,7 +62,7 @@ $(function () {
         e.preventDefault()
         var source = $('#search_link_source').html()
         var scheme = window.location.protocol == "https:" ? "https" : "http";
-        var path = scheme + '://' + window.location.host + source + '/';
+        var path = scheme + '://' + window.location.host + source;
         location.href = path
     })
 })
