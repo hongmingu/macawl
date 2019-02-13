@@ -772,11 +772,10 @@ def re_profile_suobj(request):
                     last_suojs = SubUrlObject.objects.get(uuid=last_id)
                 except Exception as e:
                     print(e)
-
                     return JsonResponse({'res': 0})
                 if last_suojs is not None:
                     suobjs = SubUrlObject.objects.filter(
-                        Q(user=user) & Q(pk_lt=last_suojs.pk)).order_by('-created').distinct()[:step]
+                        Q(user=user) & Q(pk__lt=last_suojs.pk)).order_by('-created').distinct()[:step]
 
             # 이제 리스트 만드는 코드가 필요하다. #########
 
@@ -1951,6 +1950,7 @@ def re_home(request):
                 return JsonResponse({'res': 1, 'output': output, 'end': end})
 
         return JsonResponse({'res': 2})
+
 
 @ensure_csrf_cookie
 def re_user_search_suobj(request):
